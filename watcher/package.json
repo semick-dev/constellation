@@ -1,0 +1,29 @@
+{
+  "name": "watcher",
+  "version": "0.0.1",
+  "description": "Implementation code for constellation browsable control room.",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/semick-dev/constellation.git"
+  },
+  "author": "semick-dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/semick-dev/constellation/issues"
+  },
+  "homepage": "https://github.com/semick-dev/constellation#readme",
+  "dependencies": {
+    "@azure/storage-blob": "^12.13.0",
+    "@azure/storage-queue": "^12.12.0"
+  },
+  "devDependencies": {
+    "buffer": "^6.0.3",
+    "stream-browserify": "^3.0.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.5"
+  }
+}

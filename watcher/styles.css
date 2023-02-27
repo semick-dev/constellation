@@ -1,0 +1,15 @@
+#connection {
+    background-color: lightsteelblue;
+}
+
+#viewport {
+    background-color: lightsteelblue;
+    height: 300px;
+    width: 500px;
+}
+
+#output {
+    height: 300px;
+    width: 500px;
+    background-color: antiquewhite;
+}

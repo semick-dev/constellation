@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
+        <title>Watcher 👁️</title>
+
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👁️</text></svg>">
+
+        <script type="text/javascript" src="dist/watcher.js"></script>
+
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <br />
+        <h1>
+            Enter a connection string below
+        </h1>
+        <div id="connection" width="300px" contenteditable="true">
+        your connection string here
+        </div>
+
+        <br />
+        <br />
+        <br />
+
+        <button id="enqueue">Enqueue Work</button>
+        <button id="dequeue">Dequeue Work</button>
+        
+        <div id="viewport">
+        </div>
+
+        <div id="output">
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        document.getElementById("enqueue").addEventListener("click", async function(event){
+            let watcher = new watcher.WatcherClient(document.getElementById("connection").innerHTML, "watcher")
+            
+            await watcher.enqueue();
+        });
+
+        document.getElementById("dequeue").addEventListener("click", async function(event){
+            let watcher = new watcher.WatcherClient(document.getElementById("connection").innerHTML, "watcher")
+            
+            let result = await watcher.dequeue();
+
+            document.getElementById("viewport").innerHTML = JSON.stringify(result);
+        });
+    </script>
+</html>
