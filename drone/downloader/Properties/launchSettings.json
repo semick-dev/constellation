@@ -2,7 +2,7 @@
   "profiles": {
     "Constellation.Drone.Downloader": {
       "commandName": "Project",
-      "commandLineArgs": "DefaultEndpointsProtocol=https;AccountName=scottydoes;AccountKey=9zxzxXjgQ+94whZ6x+PfTFH0MLMKtVI2M0M5IXwuMP8B+AJSCePnNwXgfdSjrWOYOLJc5nH1I59HbbxHugy85w==;EndpointSuffix=core.windows.net"
+      "commandLineArgs": ""
     }
   }
 }
