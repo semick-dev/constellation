@@ -1,5 +1,7 @@
 #connection {
     background-color: lightsteelblue;
+    height: 60px;
+    word-wrap: normal;
 }
 
 #viewport {

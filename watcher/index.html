@@ -16,7 +16,7 @@
         <h1>
             Enter a connection string below
         </h1>
-        <div id="connection" width="300px" contenteditable="true">
+        <div id="connection"contenteditable="true">
         your connection string here
         </div>
 
@@ -36,13 +36,13 @@
 
     <script type="text/javascript">
         document.getElementById("enqueue").addEventListener("click", async function(event){
-            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").innerHTML, "watcher")
+            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").innerText, "watcher")
             
             await watcherClient.enqueue();
         });
 
         document.getElementById("dequeue").addEventListener("click", async function(event){
-            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").innerHTML, "watcher")
+            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").innerText, "watcher")
             
             let result = await watcherClient.dequeue();
             document.getElementById("viewport").innerHTML = JSON.stringify(result);
