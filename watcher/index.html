@@ -36,16 +36,15 @@
 
     <script type="text/javascript">
         document.getElementById("enqueue").addEventListener("click", async function(event){
-            let watcher = new watcher.WatcherClient(document.getElementById("connection").innerHTML, "watcher")
+            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").innerHTML, "watcher")
             
-            await watcher.enqueue();
+            await watcherClient.enqueue();
         });
 
         document.getElementById("dequeue").addEventListener("click", async function(event){
-            let watcher = new watcher.WatcherClient(document.getElementById("connection").innerHTML, "watcher")
+            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").innerHTML, "watcher")
             
-            let result = await watcher.dequeue();
-
+            let result = await watcherClient.dequeue();
             document.getElementById("viewport").innerHTML = JSON.stringify(result);
         });
     </script>
