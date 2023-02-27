@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Constellation.Drone.Downloader": {
-      "commandName": "Project",
-      "commandLineArgs": ""
-    }
-  }
-}
