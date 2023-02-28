@@ -9,7 +9,10 @@ Mostly written in .NET. Forays into other languages as necessary.
 
 Requirements:
 
-- [x] Install .NET 6.0 SDK
+- [x] Install .NET 6.0 SDK (`Drone/downloader`)
+- [x] Install Node 19 (`watcher`)
+- [x] `npm install -g typescript` (`watcher`)
+- [x] `npm install -g webpack` (`watcher`)
 
 Installation
 

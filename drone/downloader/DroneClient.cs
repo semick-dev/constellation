@@ -1,11 +1,8 @@
 ﻿using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Constellation.Drone.Downloader.DownloadClient;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Constellation.Drone.Downloader
 {
@@ -18,6 +15,11 @@ namespace Constellation.Drone.Downloader
 
     public class DroneClient
     {
+        private Dictionary<string, IDownloader> _operations = new Dictionary<string, IDownloader>()
+        {
+            { "youtubedl", new YTDLDownloader() }
+        };
+
         QueueClient queue { get; set; }
 
         public DroneClient(string connectionString, string queueName) {
@@ -46,11 +48,6 @@ namespace Constellation.Drone.Downloader
             return Encoding.UTF8.GetString(base64EncodedBytes);
         }
 
-        public void DoWork(WatcherPayload payload)
-        {
-
-        }
-
         public void EnqueueWork()
         {
             var payload = new WatcherPayload()
@@ -69,14 +66,49 @@ namespace Constellation.Drone.Downloader
             }
         }
 
-        public WatcherPayload GetWork()
+        public void DoWork(WatcherPayload payload)
+        {
+            Console.WriteLine($"Invoking {payload.PayloadType} against URL {payload.Url} with quality of {payload.QualitySelection}.");
+
+            try
+            {
+                if (payload.PayloadType != null)
+                {
+                    var handler = _operations[payload.PayloadType];
+
+                    handler.Download(payload);
+                }
+                else
+                {
+                    _e("Null handlertype is unacceptable!");
+                }
+            }
+            catch(Exception e)
+            {
+                _e(e.ToString());
+            }
+        }
+
+        private void _e(string message)
+        {
+            Console.WriteLine(message);
+            Environment.Exit(1);
+        }
+
+        public WatcherPayload? GetWork()
         {
             QueueMessage? queueMessage = null;
             WatcherPayload payload = new WatcherPayload();
 
             try
             {
-                queueMessage = queue.ReceiveMessage().Value;
+                 queueMessage = queue.ReceiveMessage().Value;
+
+                if (queueMessage == null)
+                {
+                    return null;
+                }
+
                 var jsonString = Base64Decode(Encoding.UTF8.GetString(queueMessage.Body));
 
                 var document = JsonDocument.Parse(jsonString);
@@ -88,26 +120,26 @@ namespace Constellation.Drone.Downloader
                 }
                 else
                 {
-                    Console.WriteLine($"Unable to deserialize \"{jsonString}\"");
-                    Environment.Exit(1);
+                    _e($"Unable to deserialize \"{jsonString}\"");
                 }
                 
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Unable to get queueMessage");
-                Console.WriteLine(ex.Message);
-                Environment.Exit(1);
+                _e(ex.Message);
             }
 
             try
             {
-                queue.DeleteMessage(queueMessage.MessageId, queueMessage.PopReceipt);
+                if(queueMessage != null)
+                {
+                    queue.DeleteMessage(queueMessage.MessageId, queueMessage.PopReceipt);
+                }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 Console.WriteLine("Unable to cleanup queue message, continuing.");
-                Console.WriteLine(ex.Message);
             }
 
             return payload;
