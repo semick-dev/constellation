@@ -1,4 +1,4 @@
-# `Watcher``
+# `Drones`
 
-> Observe what `constellation` is doing.
+> Units of automation
 
