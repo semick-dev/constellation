@@ -12,40 +12,74 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <br />
         <h1>
-            Enter a connection string below
+            Set a connection string
         </h1>
-        <div id="connection"contenteditable="true">
-        your connection string here
+
+        <label for="connection">SAS Connection String: </label>
+        <input  autocomplete="on" type="text" id="connection"/>
+
+
+        
+        <div>
+            <h1>
+                Queue a work item
+            </h1>
+            <form id="submissioncontrol">
+                <ul>
+                    <li>
+                        <label for="url">URL: </label>
+                        <input type="text" id="url"/>
+                    <li>
+                        <label for="payloadtype">Targeted Resource: </label>
+                        <select name="payload_type" id="payloadtype">
+                            <option value="youtubedl">YoutubeDL</option>
+                        </select>
+                    </li>
+                    <li>
+                        <label for="qualityselection">Audio or Video: </label>
+
+                        <select name="quality_selection" id="qualityselection">
+                            <option value="bestaudio+bestvideo">Audio + Video</option>
+                            <option value="bestaudio">Audio Only</option>
+                        </select>
+                    </li>
+                    <li>
+                        <button id="enqueue" class="button" type="button">Queue</button>
+                    </li>
+                </ul>
+            </form>
         </div>
 
-        <br />
-        <br />
-        <br />
-
-        <button id="enqueue">Enqueue Work</button>
+        <h2>
+            Dequeue a workitem    
+        </h2>
         <button id="dequeue">Dequeue Work</button>
         
-        <div id="viewport">
-        </div>
-
-        <div id="output">
-        </div>
+        <h3>
+            View Result Output
+        </h3>
+        <textarea id="viewport">Output will be displayed here.</textarea>
     </body>
 
     <script type="text/javascript">
         document.getElementById("enqueue").addEventListener("click", async function(event){
-            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").innerText, "watcher")
+            let connectionValue = document.getElementById("connection").value;
+            let watcherClient = new watcher.WatcherClient(connectionValue, "watcher")
             
-            await watcherClient.enqueue();
+            let payloadType = document.getElementById("payloadtype").value;
+            let qualitySelection = document.getElementById("qualityselection").value;
+            let url = document.getElementById("url").value;
+
+            let payload = new watcher.WatcherPayload(payloadType, qualitySelection, url);
+
+            await watcherClient.enqueue(payload);
         });
 
         document.getElementById("dequeue").addEventListener("click", async function(event){
-            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").innerText, "watcher")
-            
+            let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher")
             let result = await watcherClient.dequeue();
-            document.getElementById("viewport").innerHTML = JSON.stringify(result);
+            document.getElementById("viewport").innerHTML = JSON.stringify(result, undefined, 4);
         });
     </script>
 </html>

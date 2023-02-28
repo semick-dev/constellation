@@ -28,19 +28,20 @@ export class WatcherClient {
 
     constructor(connectionString: string, queueName: string){
         this.Blob = BlobServiceClient.fromConnectionString(connectionString);
+        console.log(this.Blob);
+
         this.Queue = QueueServiceClient.fromConnectionString(connectionString).getQueueClient(queueName);
+        console.log(this.Queue);
     }
 
-    async enqueue(): Promise<void> {
-        let data = new WatcherPayload(
-            "youtubedl",
-            "bestaudio",
-            "https://youtu.be/JIHjJjaeHAA?list=FL7Nyaz8DK7bhCUA3ZcvvrmA"
-        )
+    async enqueue(payload: WatcherPayload): Promise<void> {
+        let message: string = jsonToBase64(payload);
 
-        let message: string = jsonToBase64(data);
+        console.log(message);
 
-        await this.Queue.sendMessage(message);
+        let result = await this.Queue.sendMessage(message);
+        
+        console.log(result);
     }
 
     async dequeue(): Promise<WatcherPayload> {
