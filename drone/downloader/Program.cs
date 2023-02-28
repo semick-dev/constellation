@@ -13,7 +13,7 @@ namespace Constellation.Drone.Downloader
             var client = new DroneClient(connectionString, queueName);
             var work = client.GetWork();
 
-            if (work.Item2 != null)
+            if (work !=null && work.Item2 != null)
             {
                 client.DoWork(work.Item2);
             }
