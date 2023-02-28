@@ -95,7 +95,7 @@ namespace Constellation.Drone.Downloader
             Environment.Exit(1);
         }
 
-        public WatcherPayload? GetWork()
+        public Tuple<QueueMessage?, WatcherPayload?> GetWork()
         {
             QueueMessage? queueMessage = null;
             WatcherPayload payload = new WatcherPayload();
@@ -142,7 +142,7 @@ namespace Constellation.Drone.Downloader
                 Console.WriteLine("Unable to cleanup queue message, continuing.");
             }
 
-            return payload;
+            return new Tuple<QueueMessage?, WatcherPayload?>(queueMessage, payload);
         }
     }
 }
