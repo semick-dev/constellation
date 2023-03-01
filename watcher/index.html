@@ -87,7 +87,9 @@
 
                 setOutputWindowStatus("loading", "Adding Queue Item...");
                 let result = await watcherClient.enqueue(payload);
+                document.getElementById("url").value = '';
                 setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+                
             }
             catch(err) {
                 setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));

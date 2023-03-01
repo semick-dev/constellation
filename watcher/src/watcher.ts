@@ -22,23 +22,18 @@ function encodeBase64ToJson(base64String: string) {
     return JSON.parse(jsonString)
 }
 
+// We are deliberately not catching exceptions in all functions herein. This aids in easier UI response to errors.
 export class WatcherClient {
     Blob: BlobServiceClient;
     Queue: QueueClient;
 
     constructor(connectionString: string, queueName: string){
         this.Blob = BlobServiceClient.fromConnectionString(connectionString);
-        console.log(this.Blob);
-
         this.Queue = QueueServiceClient.fromConnectionString(connectionString).getQueueClient(queueName);
-        console.log(this.Queue);
     }
 
     async enqueue(payload: WatcherPayload): Promise<QueueSendMessageResponse> {
         let message: string = jsonToBase64(payload);
-
-        console.log(message);
-
         let result = await this.Queue.sendMessage(message);
         return result;
     }
