@@ -90,7 +90,7 @@
                 setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err) {
-                output.classList.add("failure", JSON.stringify(err, undefined, 4));
+                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });
 
@@ -103,7 +103,7 @@
                 setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err){
-                output.classList.add("failure", JSON.stringify(err, undefined, 4));
+                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });
     </script>
