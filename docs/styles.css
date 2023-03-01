@@ -82,6 +82,10 @@ body {
     background-color: lightsalmon;
 }
 
+.loading {
+    background-color: lightgoldenrodyellow;
+}
+
 #output {
     height: 300px;
     width: 500px;
