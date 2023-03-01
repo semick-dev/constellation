@@ -63,6 +63,17 @@
     </body>
 
     <script type="text/javascript">
+        function setOutputWindowStatus(classStatus, message){
+            let classlist = ["success", "failure", "loading", "unknown"];
+            let outputWindow = document.getElementById("viewport");
+
+            for(var i = 0; i < classlist.length; i++){
+                outputWindow.classList.remove(classlist[i]);
+            }
+            outputWindow.classList.add(classStatus);
+            outputWindow.innerHTML = message;
+        }
+
         document.getElementById("enqueue").addEventListener("click", async function(event){
             let connectionValue = document.getElementById("connection").value;
             let watcherClient = new watcher.WatcherClient(connectionValue, "watcher")
@@ -73,13 +84,27 @@
 
             let payload = new watcher.WatcherPayload(payloadType, qualitySelection, url);
 
-            await watcherClient.enqueue(payload);
+            try {
+                setOutputWindowStatus("loading", "Adding Queue Item...");
+                let result = await watcherClient.enqueue(payload);
+                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+            }
+            catch(err) {
+                output.classList.add("failure", JSON.stringify(err, undefined, 4));
+            }
         });
 
         document.getElementById("dequeue").addEventListener("click", async function(event){
             let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher")
-            let result = await watcherClient.dequeue();
-            document.getElementById("viewport").innerHTML = JSON.stringify(result, undefined, 4);
+
+            try {
+                setOutputWindowStatus("loading", "Retrieving Item From Queue...");
+                let result = await watcherClient.dequeue();
+                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+            }
+            catch(err){
+                output.classList.add("failure", JSON.stringify(err, undefined, 4));
+            }
         });
     </script>
 </html>

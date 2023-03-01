@@ -1,5 +1,5 @@
 import { BlobServiceClient } from "@azure/storage-blob";
-import { QueueClient, QueueServiceClient } from "@azure/storage-queue";
+import { QueueClient, QueueSendMessageResponse, QueueServiceClient } from "@azure/storage-queue";
 
 export class WatcherPayload {
     PayloadType: string;
@@ -34,14 +34,13 @@ export class WatcherClient {
         console.log(this.Queue);
     }
 
-    async enqueue(payload: WatcherPayload): Promise<void> {
+    async enqueue(payload: WatcherPayload): Promise<QueueSendMessageResponse> {
         let message: string = jsonToBase64(payload);
 
         console.log(message);
 
         let result = await this.Queue.sendMessage(message);
-        
-        console.log(result);
+        return result;
     }
 
     async dequeue(): Promise<WatcherPayload> {
