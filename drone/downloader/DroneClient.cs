@@ -20,20 +20,13 @@ namespace Constellation.Drone.Downloader
             { "youtubedl", new YTDLDownloader() }
         };
 
-        QueueClient queue { get; set; }
+        QueueClient? queue { get; set; }
+
+        public DroneClient() { }
 
         public DroneClient(string connectionString, string queueName) {
-            try
-            {
-                queue = new QueueClient(connectionString, queueName);
-                queue.CreateIfNotExists();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Unable to create initial queue connection.");
-                Console.WriteLine(ex.ToString());
-                Environment.Exit(1);
-            }
+            queue = new QueueClient(connectionString, queueName);
+            queue.CreateIfNotExists();
         }
 
         public static string Base64Encode(string plainText)
@@ -48,44 +41,33 @@ namespace Constellation.Drone.Downloader
             return Encoding.UTF8.GetString(base64EncodedBytes);
         }
 
-        public void EnqueueWork()
+        public void EnqueueWork(WatcherPayload payload)
         {
-            var payload = new WatcherPayload()
+            if (queue != null)
             {
-                PayloadType = "youtubedl",
-                QualitySelection = "bestaudio",
-                Url = "https://youtu.be/Cnas3DmIMt0?list=FL7Nyaz8DK7bhCUA3ZcvvrmA"
-            };
+                var message = JsonSerializer.Serialize<WatcherPayload>(payload);
 
-            var message = JsonSerializer.Serialize<WatcherPayload>(payload);
+                if (message != null)
+                {
+                    var bodyString = Base64Encode(message);
 
-            if (message != null) {
-                var bodyString = Base64Encode(message);
-
-                queue.SendMessage(bodyString);
+                    queue.SendMessage(bodyString);
+                }
             }
         }
 
         public void DoWork(WatcherPayload payload)
         {
             Console.WriteLine($"Invoking {payload.PayloadType} against URL {payload.Url} with quality of {payload.QualitySelection}.");
-
-            try
+            if (payload.PayloadType != null)
             {
-                if (payload.PayloadType != null)
-                {
-                    var handler = _operations[payload.PayloadType];
+                var handler = _operations[payload.PayloadType];
 
-                    handler.Download(payload);
-                }
-                else
-                {
-                    _e("Null handlertype is unacceptable!");
-                }
+                handler.Download(payload);
             }
-            catch(Exception e)
+            else
             {
-                _e(e.ToString());
+                _e("Null handlertype is unacceptable!");
             }
         }
 
@@ -95,54 +77,60 @@ namespace Constellation.Drone.Downloader
             Environment.Exit(1);
         }
 
-        public Tuple<QueueMessage?, WatcherPayload?> GetWork()
+        public Tuple<QueueMessage?, WatcherPayload?>? GetWork()
         {
-            QueueMessage? queueMessage = null;
-            WatcherPayload payload = new WatcherPayload();
-
-            try
+            if (queue != null)
             {
-                 queueMessage = queue.ReceiveMessage().Value;
+                QueueMessage? queueMessage = null;
+                WatcherPayload payload = new WatcherPayload();
 
-                if (queueMessage == null)
+                try
                 {
-                    return null;
+                    queueMessage = queue.ReceiveMessage().Value;
+
+                    if (queueMessage == null)
+                    {
+                        return null;
+                    }
+
+                    var jsonString = Base64Decode(Encoding.UTF8.GetString(queueMessage.Body));
+
+                    var document = JsonDocument.Parse(jsonString);
+
+                    var result = JsonSerializer.Deserialize<WatcherPayload>(document);
+
+                    if (result != null)
+                    {
+                        payload = result;
+                    }
+                    else
+                    {
+                        _e($"Unable to deserialize \"{jsonString}\"");
+                    }
+
                 }
-
-                var jsonString = Base64Decode(Encoding.UTF8.GetString(queueMessage.Body));
-
-                var document = JsonDocument.Parse(jsonString);
-
-                var result = JsonSerializer.Deserialize<WatcherPayload>(document);
-
-                if (result != null) {
-                    payload = result;
-                }
-                else
+                catch (Exception ex)
                 {
-                    _e($"Unable to deserialize \"{jsonString}\"");
+                    Console.WriteLine("Unable to get queueMessage");
+                    _e(ex.Message);
                 }
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Unable to get queueMessage");
-                _e(ex.Message);
-            }
 
-            try
-            {
-                if(queueMessage != null)
+                try
                 {
-                    queue.DeleteMessage(queueMessage.MessageId, queueMessage.PopReceipt);
+                    if (queueMessage != null)
+                    {
+                        queue.DeleteMessage(queueMessage.MessageId, queueMessage.PopReceipt);
+                    }
                 }
-            }
-            catch(Exception)
-            {
-                Console.WriteLine("Unable to cleanup queue message, continuing.");
+                catch (Exception)
+                {
+                    Console.WriteLine("Unable to cleanup queue message, continuing.");
+                }
+
+                return new Tuple<QueueMessage?, WatcherPayload?>(queueMessage, payload);
             }
 
-            return new Tuple<QueueMessage?, WatcherPayload?>(queueMessage, payload);
+            return null;
         }
     }
 }

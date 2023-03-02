@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Constellation.Drone.Downloader.DownloadClient;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -78,13 +79,13 @@ namespace Constellation.Drone.Downloader
 
                     if (process.ExitCode != 0)
                     {
-                        Console.WriteLine("Unable to download! ahghgh1");
+                        throw new RetriableMessageException($"Ran into a non-zero exitcode attempting to download: {process.ExitCode}. Enqueuing message for later work");
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Unable to download! ahghgh1");
+                throw new RetriableMessageException("Ran into an unexpected exception while starting the youtube-dl process. " + e.Message + " Enqueueing message for later work.");
             }
         }
     }
