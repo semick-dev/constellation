@@ -55,26 +55,50 @@ namespace Constellation.Drone.Downloader.DownloadClient
             return "";
         }
 
+        private async Task<byte[]> getImageBytes(string videoId)
+        {
+            byte[] result = new byte[0];
+            string[] urlsInDescendingOrder = new string[]
+            {
+                $"https://img.youtube.com/vi/{videoId}/maxresdefault.jpg",
+                $"https://img.youtube.com/vi/{videoId}/sddefault.jpg",
+                $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg",
+                $"https://img.youtube.com/vi/{videoId}/mqdefault.jpg",
+                $"https://img.youtube.com/vi/{videoId}/default.jpg",
+            };
+
+            using (var client = new HttpClient())
+            {
+                foreach (var url in urlsInDescendingOrder)
+                {
+                    try
+                    {
+                        return await client.GetByteArrayAsync(new Uri(url));
+                    }
+                    catch (Exception) { }
+                }
+            }
+
+            return result;
+        }
+
         private async void DownloadThumbnail(WatcherPayload payload)
         {
             if (payload.Url != null)
             {
                 var videoId = ExtractVideoId(payload.Url);
-                var thumbnailUrl = $"https://img.youtube.com/vi/{videoId}/maxresdefault.jpg";
                 var targetFile = Path.Combine(Configuration.DownloadDirectory, $"{videoId}.jpg");
 
-                using (var client = new HttpClient()) {
-                    byte[] imageBytes = new byte[0];
-                    try
-                    {
-                        imageBytes = await client.GetByteArrayAsync(new Uri(thumbnailUrl));
-                    }
-                    catch(Exception e)
-                    {
-                        Console.WriteLine($"Unable to download thumbnail for video id \"{videoId}\".");
-                        Console.WriteLine(e.Message);
-                    }
+                byte[] imageBytes = new byte[0];
+
+                imageBytes = await getImageBytes(videoId);
                     
+                if (imageBytes.Length == 0)
+                {
+                    Console.WriteLine($"Unable to download any quality thumbnail for video id \"videoId\"");
+                }
+                else
+                {
                     try
                     {
                         await File.WriteAllBytesAsync(targetFile, imageBytes);
