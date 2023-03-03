@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Constellation.Drone.Downloader.DownloadClient
@@ -12,15 +16,58 @@ namespace Constellation.Drone.Downloader.DownloadClient
         public YTDLDownloader() { }
         private ProcessHandler processHandler = new ProcessHandler();
 
-        public void Download(WatcherPayload payload)
+        public async Task<WorkResult> Download(WatcherPayload payload)
         {
             if (!Directory.Exists(Configuration.DownloadDirectory))
             {
                 Directory.CreateDirectory(Configuration.DownloadDirectory);
             }
 
-            DownloadThumbnail(payload);
-            processHandler.Run("youtube-dl", $"-f {payload.QualitySelection} -v --write-info-json {payload.Url}", Configuration.DownloadDirectory);
+            if (payload.Url != null)
+            {
+                string thumbnailUri = await DownloadThumbnail(payload);
+                string downloadFormat = "%(id)s.%(ext)s";
+
+                processHandler.Run("youtube-dl", $"-f {payload.QualitySelection} -v --write-info-json -o \"{downloadFormat}\" {payload.Url}", Configuration.DownloadDirectory);
+                string downloadUri = GetDownloadUri(payload.Url);
+
+                return new WorkResult(payload, thumbnailUri, downloadUri);
+            }
+            else
+            {
+                throw new Exception("Unable to do work on a payload with no URL.");
+            }
+        }
+
+        public string GetDownloadUri(string url)
+        {
+            string videoId = ExtractVideoId(url);
+            var infoJson = Path.Combine(Configuration.DownloadDirectory, $"{videoId}.info.json");
+            string ext = string.Empty;
+
+            using (StreamReader r = new StreamReader(infoJson))
+            {
+                string json = r.ReadToEnd();
+                var jsonNode = JsonObject.Parse(json);
+
+                if (jsonNode != null)
+                {
+                    // todo: ready to add title to name if necessary
+                    var possibleTitle = jsonNode.Root["title"];
+                    var possibleExt = jsonNode.Root["ext"];
+                    if (possibleTitle != null)
+                    {
+                        ext = possibleTitle.ToString();
+                    }
+                    if (possibleExt != null)
+                    {
+                        ext = possibleExt.ToString();
+                    }
+                    
+                }
+            }
+
+            return Path.Combine(Configuration.DownloadDirectory, $"{videoId}.{ext}");
         }
 
         public static string ExtractVideoId(string url)
@@ -82,7 +129,7 @@ namespace Constellation.Drone.Downloader.DownloadClient
             return result;
         }
 
-        private async void DownloadThumbnail(WatcherPayload payload)
+        private async Task<string> DownloadThumbnail(WatcherPayload payload)
         {
             if (payload.Url != null)
             {
@@ -102,6 +149,7 @@ namespace Constellation.Drone.Downloader.DownloadClient
                     try
                     {
                         await File.WriteAllBytesAsync(targetFile, imageBytes);
+                        return targetFile;
                     }
                     catch (Exception e)
                     {
@@ -114,7 +162,8 @@ namespace Constellation.Drone.Downloader.DownloadClient
             {
                 Console.WriteLine("Unable to download thumbnail for nonexistent video id.");
             }
-            
+
+            return string.Empty;
         }
     }
 }

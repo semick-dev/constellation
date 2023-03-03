@@ -8,6 +8,6 @@ namespace Constellation.Drone.Downloader.DownloadClient
 {
     public interface IDownloader
     {
-        public void Download(WatcherPayload payload);
+        public Task<WorkResult> Download(WatcherPayload payload);
     }
 }

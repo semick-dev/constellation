@@ -9,8 +9,8 @@ namespace Constellation.Drone.Downloader
     public class WatcherPayload
     {
         public string? PayloadType { get; set; }
-        public string? QualitySelection { get; set; }
         public string? Url { get; set; }
+        public string? QualitySelection { get; set; }
     }
 
     public class DroneClient
@@ -56,14 +56,16 @@ namespace Constellation.Drone.Downloader
             }
         }
 
-        public void DoWork(WatcherPayload payload)
+        public async Task DoWork(WatcherPayload payload)
         {
             Console.WriteLine($"Invoking {payload.PayloadType} against URL {payload.Url} with quality of {payload.QualitySelection}.");
             if (payload.PayloadType != null)
             {
                 var handler = _operations[payload.PayloadType];
 
-                handler.Download(payload);
+                var result = await handler.Download(payload);
+
+                // todo: add in call to LiteClient and log the workResult!
             }
             else
             {

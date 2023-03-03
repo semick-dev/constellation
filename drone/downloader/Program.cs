@@ -6,7 +6,7 @@ namespace Constellation.Drone.Downloader
 {
     internal class Program
     {
-        static int Main(string[] args)
+        static async Task<int> Main(string[] args)
         {
             
             var connectionString = args[0];
@@ -21,6 +21,7 @@ namespace Constellation.Drone.Downloader
             {
                 Console.WriteLine($"Unable to create queues/blobs client. Possible bad connection string value \"{args[0]}\"");
                 Console.Write(ex.Message);
+                return 1;
             }
             
             // exceptions handled here
@@ -30,7 +31,7 @@ namespace Constellation.Drone.Downloader
             {
                 if (work != null && work.Item2 != null)
                 {
-                    client.DoWork(work.Item2);
+                    await client.DoWork(work.Item2);
                 }
                 else
                 {
@@ -47,7 +48,6 @@ namespace Constellation.Drone.Downloader
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Ran into an unexpected and uncaught error. Work not re-enqueued");
                 Console.WriteLine(ex.Message);
                 Console.Write(ex.StackTrace);
                 return 1;
