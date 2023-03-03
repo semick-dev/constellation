@@ -45,7 +45,7 @@
                         </select>
                     </li>
                     <li>
-                        <button id="enqueue" class="button" type="button">Queue</button>
+                        <button id="enqueue" class="button" type="button">Queue</button><button id="requeue" class="button" type="button">Requeue Last Successful</button>
                     </li>
                 </ul>
             </form>
@@ -73,11 +73,11 @@
             outputWindow.classList.add(classStatus);
             outputWindow.innerHTML = message;
         }
+        var lastRequest = {};
 
         document.getElementById("enqueue").addEventListener("click", async function(event){
             try {
-                let connectionValue = document.getElementById("connection").value;
-                let watcherClient = new watcher.WatcherClient(connectionValue, "watcher")
+                let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
                 
                 let payloadType = document.getElementById("payloadtype").value;
                 let qualitySelection = document.getElementById("qualityselection").value;
@@ -88,6 +88,7 @@
                 setOutputWindowStatus("loading", "Adding Queue Item...");
                 let result = await watcherClient.enqueue(payload);
                 document.getElementById("url").value = '';
+                lastRequest = payload;
                 setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err) {
@@ -97,12 +98,25 @@
 
         document.getElementById("dequeue").addEventListener("click", async function(event){
             try {
-                let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher")
+                let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
                 setOutputWindowStatus("loading", "Retrieving Item From Queue...");
                 let result = await watcherClient.dequeue();
                 setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err){
+                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
+            }
+        });
+
+        document.getElementById("requeue").addEventListener("click", async function(event){
+            try {
+                let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
+                setOutputWindowStatus("loading", "Adding Queue Item...");
+                let result = await watcherClient.enqueue(lastRequest);
+                document.getElementById("url").value = '';
+                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+            }
+            catch(err) {
                 setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });

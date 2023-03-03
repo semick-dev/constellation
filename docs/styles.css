@@ -51,6 +51,7 @@ textarea {
     /* Align buttons with the text fields */
     clear: left;
     display: inline-block;
+    margin-right: 20px;
 }
 
 body {
