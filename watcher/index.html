@@ -12,54 +12,98 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <h1>
-            Set a connection string
-        </h1>
-
-        <label for="connection">SAS Connection String: </label>
-        <input  autocomplete="on" type="text" id="connection"/>
-
-
+        <div id="main">
+            <div id="controlspanel">
+                <h1>
+                    Set a connection string
+                </h1>
         
-        <div>
-            <h1>
-                Queue a work item
-            </h1>
-            <form id="submissioncontrol">
-                <ul>
-                    <li>
-                        <label for="url">URL: </label>
-                        <input type="text" id="url"/>
-                    <li>
-                        <label for="payloadtype">Targeted Resource: </label>
-                        <select name="payload_type" id="payloadtype">
-                            <option value="youtubedl">YoutubeDL</option>
-                        </select>
-                    </li>
-                    <li>
-                        <label for="qualityselection">Audio or Video: </label>
-
-                        <select name="quality_selection" id="qualityselection">
-                            <option value="bestaudio+bestvideo">Audio + Video</option>
-                            <option value="bestaudio">Audio Only</option>
-                        </select>
-                    </li>
-                    <li>
-                        <button id="enqueue" class="button" type="button">Queue</button><button id="requeue" class="button" type="button">Requeue Last Successful</button>
-                    </li>
-                </ul>
-            </form>
+                <label for="connection">SAS Connection String: </label>
+                <input  autocomplete="on" type="text" id="connection"/>
+        
+                <h1>
+                    Queue a work item
+                </h1>
+                <form id="submissioncontrol">
+                    <ul>
+                        <li>
+                            <label for="url">URL: </label>
+                            <input type="text" id="url"/>
+                        <li>
+                            <label for="payloadtype">Targeted Resource: </label>
+                            <select name="payload_type" id="payloadtype">
+                                <option value="youtubedl">YoutubeDL</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label for="qualityselection">Audio or Video: </label>
+    
+                            <select name="quality_selection" id="qualityselection">
+                                <option value="bestaudio+bestvideo">Audio + Video</option>
+                                <option value="bestaudio">Audio Only</option>
+                            </select>
+                        </li>
+                        <li>
+                            <button id="enqueue" class="button" type="button">Queue</button><button id="requeue" class="button" type="button">Requeue Last Successful</button>
+                        </li>
+                    </ul>
+                </form>
+                <h2>
+                    Dequeue a workitem    
+                </h2>
+                <button id="dequeue">Dequeue Work</button>
+                
+                <h3>
+                    View Result Output
+                </h3>
+                <textarea id="viewport">Output will be displayed here.</textarea>
+            </div>
+            <div id="sidepanel">
+                <h3>Queue Status</h3>
+                <table id="sidepaneldata">
+                    <tr>
+                        <td><iframe 
+                            src="https://www.youtube.com/embed/YMjc6hEi730" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                             allowfullscreen>
+                        </iframe></td>
+                    </tr>
+                    <tr>
+                        <td><iframe 
+                            src="https://www.youtube.com/embed/YMjc6hEi730" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                             allowfullscreen>
+                        </iframe></td>
+                    </tr>
+                    <tr>
+                        <td><iframe 
+                            src="https://www.youtube.com/embed/YMjc6hEi730" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                             allowfullscreen>
+                        </iframe></td>
+                    </tr>
+                    <tr>
+                        <td><iframe 
+                            src="https://www.youtube.com/embed/5w3st9mJXWI" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                             allowfullscreen>
+                        </iframe></td>
+                    </tr>
+                    <tr>
+                        <td><iframe 
+                            src="https://www.youtube.com/embed/y8BUc_aYZ-M" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                             allowfullscreen>
+                        </iframe></td>
+                    </tr>
+                </table>
+            </div>
         </div>
-
-        <h2>
-            Dequeue a workitem    
-        </h2>
-        <button id="dequeue">Dequeue Work</button>
-        
-        <h3>
-            View Result Output
-        </h3>
-        <textarea id="viewport">Output will be displayed here.</textarea>
     </body>
 
     <script type="text/javascript">
