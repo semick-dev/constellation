@@ -48,6 +48,10 @@
                         </li>
                     </ul>
                 </form>
+            </div>
+            <div id="sidepanel">
+            </div>
+            <div id="outputpanel">
                 <h2>
                     Dequeue a workitem    
                 </h2>
@@ -58,67 +62,13 @@
                 </h3>
                 <textarea id="viewport">Output will be displayed here.</textarea>
             </div>
-            <div id="sidepanel">
-                <h3>Queue Status</h3>
-                <table id="sidepaneldata">
-                    <tr>
-                        <td><iframe 
-                            src="https://www.youtube.com/embed/YMjc6hEi730" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                             allowfullscreen>
-                        </iframe></td>
-                    </tr>
-                    <tr>
-                        <td><iframe 
-                            src="https://www.youtube.com/embed/YMjc6hEi730" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                             allowfullscreen>
-                        </iframe></td>
-                    </tr>
-                    <tr>
-                        <td><iframe 
-                            src="https://www.youtube.com/embed/YMjc6hEi730" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                             allowfullscreen>
-                        </iframe></td>
-                    </tr>
-                    <tr>
-                        <td><iframe 
-                            src="https://www.youtube.com/embed/5w3st9mJXWI" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                             allowfullscreen>
-                        </iframe></td>
-                    </tr>
-                    <tr>
-                        <td><iframe 
-                            src="https://www.youtube.com/embed/y8BUc_aYZ-M" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                             allowfullscreen>
-                        </iframe></td>
-                    </tr>
-                </table>
-            </div>
         </div>
     </body>
 
     <script type="text/javascript">
-        function setOutputWindowStatus(classStatus, message){
-            let classlist = ["success", "failure", "loading", "unknown"];
-            let outputWindow = document.getElementById("viewport");
+        let tOut = watcher.StartQueueWatcher(document.getElementById("sidepanel"), "connection")
 
-            for(var i = 0; i < classlist.length; i++){
-                outputWindow.classList.remove(classlist[i]);
-            }
-            outputWindow.classList.add(classStatus);
-            outputWindow.innerHTML = message;
-        }
         var lastRequest = {};
-
         document.getElementById("enqueue").addEventListener("click", async function(event){
             try {
                 let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
@@ -129,39 +79,39 @@
 
                 let payload = new watcher.WatcherPayload(payloadType, qualitySelection, url);
 
-                setOutputWindowStatus("loading", "Adding Queue Item...");
+                watcher.SetOutputWindowStatus("loading", "Adding Queue Item...");
                 let result = await watcherClient.enqueue(payload);
                 document.getElementById("url").value = '';
                 lastRequest = payload;
-                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+                watcher.SetOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err) {
-                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
+                watcher.SetOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });
 
         document.getElementById("dequeue").addEventListener("click", async function(event){
             try {
                 let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
-                setOutputWindowStatus("loading", "Retrieving Item From Queue...");
+                watcher.SetOutputWindowStatus("loading", "Retrieving Item From Queue...");
                 let result = await watcherClient.dequeue();
-                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+                watcher.SetOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err){
-                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
+                watcher.SetOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });
 
         document.getElementById("requeue").addEventListener("click", async function(event){
             try {
                 let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
-                setOutputWindowStatus("loading", "Adding Queue Item...");
+                watcher.SetOutputWindowStatus("loading", "Adding Queue Item...");
                 let result = await watcherClient.enqueue(lastRequest);
                 document.getElementById("url").value = '';
-                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+                watcher.SetOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err) {
-                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
+                watcher.SetOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });
     </script>

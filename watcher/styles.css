@@ -30,10 +30,21 @@ body {
 
 #sidepanel table {
     width: 100%;
+    text-align: center;
 }
 
 #sidepanel iframe {
     width: 100%;
+}
+
+#sidepanel iframe .previewitem {
+    width: 100%;
+}
+
+#outputpanel {
+    width: 100%;
+    clear: left;
+    float: left;
 }
 
 #connection {
