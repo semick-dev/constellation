@@ -203,7 +203,7 @@ function isAssigned(id: string): boolean {
 }
 
 function removePayload(id: string|WatcherPayload, items: WatcherPayload[]): void {
-    if (id instanceof WatcherPayload){
+    if (id instanceof Object){
         const index =  items.findIndex(x => x.VideoId == id.VideoId);
         if (index > -1) {
             items.splice(index, 1);
@@ -219,8 +219,6 @@ function removePayload(id: string|WatcherPayload, items: WatcherPayload[]): void
 }
 
 export function SetQueuedItems(containingElement: HTMLElement, payloads: Array<WatcherPayload>): void {
-    // todo: ensure that if the set of messages is the same, we don't refresh.
-    console.log(payloads);
     let waitingForAssignation: string[] = [];
     let itemsForAssignation: WatcherPayload[] = payloads.slice(0, 8);
     let existingAssignations: string[] = getCurrentAssignations(containingElement); // 8 long too
@@ -237,7 +235,7 @@ export function SetQueuedItems(containingElement: HTMLElement, payloads: Array<W
 
         // if this target id (which already exists on the page) exists in items for assignation, our work is complete for now
         if (indexInItems > -1){
-            removePayload(itemsForAssignation[indexInItems], itemsForAssignation)
+            removePayload(itemsForAssignation[indexInItems], itemsForAssignation);
         }
         else {
             // these cells dont have a place in the queue, and so should be cleared
@@ -258,7 +256,7 @@ export function SetQueuedItems(containingElement: HTMLElement, payloads: Array<W
             updateCell(idForReplacement, payload);
         }
         else {
-            console.log("No cell available to update.");
+            console.log("No cell available to update, waiting to assign" + payload.VideoId );
         }
     }
     
