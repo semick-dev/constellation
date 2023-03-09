@@ -5,11 +5,13 @@ export class WatcherPayload {
     PayloadType: string;
     QualitySelection: string;
     Url: string;
+    VideoId: string;
 
     constructor(payloadType: string, qualitySelection: string, url: string){
         this.PayloadType = payloadType;
         this.QualitySelection = qualitySelection;
         this.Url = url;
+        this.VideoId = extractVideoId(this);
     }
 }
 
@@ -68,26 +70,202 @@ export function SetOutputWindowStatus(classStatus: string, message: string): voi
     }
 }
 
+export var lastSet: WatcherPayload[];
+
+function getCurrentAssignations(containingElement: HTMLElement): Array<string> {
+    let currentAssignationsTable = document.getElementById('sidepaneldata');
+
+    // we've already populated, we gotta scrape
+    if (currentAssignationsTable != null){
+        let existingAssignations: HTMLCollectionOf<Element> = document.getElementsByClassName('previewItem')
+        let idsInOrder: Array<string> = [];
+
+        for (let i = 0; i < existingAssignations.length; i++) {
+            idsInOrder.push(existingAssignations[i].id);
+        }
+        
+        return idsInOrder;
+    }
+
+    return [];
+}
+
+function generateTable(): string {
+    // initialize table, then get existing assignations to fill the ready ids
+    let completeTable: string = `
+    <h3>Queued Items</h3>
+    <table id="sidepaneldata" style="width:100%; padding: 0; margin: 0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td class="queueItem">
+                <iframe
+                    id="id0"
+                    class="previewItem"
+                    src=""
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
+            </td>
+            <td class="queueItem">
+                <iframe
+                    id="id1"
+                    class="previewItem"
+                    src=""
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
+            </td>
+            <td class="queueItem">
+                <iframe
+                    id="id2"
+                    class="previewItem"
+                    src=""
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
+            </td>
+            <td class="queueItem">
+                <iframe
+                    id="id3"
+                    class="previewItem"
+                    src=""
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="queueItem">
+                <iframe
+                    id="id4"
+                    class="previewItem"
+                    src=""
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
+            </td>
+            <td class="queueItem">
+                <iframe
+                    id="id5"
+                    class="previewItem"
+                    src=""
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
+            </td>
+            <td class="queueItem">
+                <iframe
+                    id="id6"
+                    class="previewItem"
+                    src=""
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
+            </td>
+            <td class="queueItem">
+                <iframe
+                    id="id7"
+                    class="previewItem"
+                    src=""
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
+            </td>
+        </tr>
+    </table>
+    `
+    return completeTable;
+}
+
+function updateCell(existingId: string, update: WatcherPayload): void {
+    let element = document.getElementById(existingId) as HTMLIFrameElement;
+
+    if (element != null){
+        if(update.VideoId.length > 0){
+            element.src = `https://www.youtube.com/embed/${update.VideoId}`
+            element.id = update.VideoId;
+        }
+        else {
+            // only update if it's not already blank
+            if (!element.id.startsWith("fake")){
+                element.src = ``;
+                element.id = "fake" + crypto.randomUUID();
+            }
+        }
+    }
+    else {
+        console.log(`Could not update cell of target id ${existingId}. Don't know what to do with ${update.Url}`)
+    }
+}
+
+function isAssigned(id: string): boolean {
+    return  document.getElementById(id) != null;
+}
+
+function removePayload(id: string|WatcherPayload, items: WatcherPayload[]): void {
+    if (id instanceof WatcherPayload){
+        const index =  items.findIndex(x => x.VideoId == id.VideoId);
+        if (index > -1) {
+            items.splice(index, 1);
+        }
+    }
+    // string
+    else {
+        const index =  items.findIndex(x => x.VideoId == id);
+        if (index > -1) {
+            items.splice(index, 1);
+        } 
+    }
+}
+
 export function SetQueuedItems(containingElement: HTMLElement, payloads: Array<WatcherPayload>): void {
     // todo: ensure that if the set of messages is the same, we don't refresh.
     console.log(payloads);
+    let waitingForAssignation: string[] = [];
+    let itemsForAssignation: WatcherPayload[] = payloads.slice(0, 8);
+    let existingAssignations: string[] = getCurrentAssignations(containingElement); // 8 long too
 
-    let completeTable: string = `<h3>Queued Items</h3><table id="sidepaneldata">`
-    payloads.forEach(payload => {
-        let videoId: string = extractVideoId(payload)
-        let tableTier: string = `<tr><td>
-        <iframe
-            class="previewItem"
-            src="https://www.youtube.com/embed/${videoId}"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
-        </iframe></td></tr>`
+    if (existingAssignations.length === 0) {
+        containingElement.innerHTML = generateTable();
+        existingAssignations = getCurrentAssignations(containingElement);
+    }
+    
+    // walk across the existing assignations
+    for (var i = 0; i < existingAssignations.length; i++) {
+        let targetId = existingAssignations[i];
+        let indexInItems = itemsForAssignation.findIndex(x => x.VideoId == targetId);
 
-        completeTable += tableTier
-    });
-    completeTable += "</table>"
+        // if this target id (which already exists on the page) exists in items for assignation, our work is complete for now
+        if (indexInItems > -1){
+            removePayload(itemsForAssignation[indexInItems], itemsForAssignation)
+        }
+        else {
+            // these cells dont have a place in the queue, and so should be cleared
+            waitingForAssignation.push(targetId);
+        }
+    }
 
-    containingElement.innerHTML = completeTable;
+    // because plain string arrays can only be appended, we need to reverse to get into the same order as the display order again
+    waitingForAssignation = waitingForAssignation.reverse()
+
+    // now walk across the items we have for assignation, there should be succicient cells available
+    // to override
+    for (var i = 0; i < itemsForAssignation.length; i++) {
+        let payload = itemsForAssignation[i];
+        let idForReplacement = waitingForAssignation.pop();
+
+        if (idForReplacement !== undefined){
+            updateCell(idForReplacement, payload);
+        }
+        else {
+            console.log("No cell available to update.");
+        }
+    }
+    
+    // if there are remaining cells, that means that we have less queue items than remaining cells to fill with an ifram
+    for (var i = 0; i < waitingForAssignation.length; i++) {
+        updateCell(waitingForAssignation[i], { VideoId: "", Url: "" } as WatcherPayload)
+    }
 }
 
 export function StartQueueWatcher(containingElement: HTMLElement, connectionElement: string):  NodeJS.Timeout {
@@ -96,11 +274,12 @@ export function StartQueueWatcher(containingElement: HTMLElement, connectionElem
             let cs = (document.getElementById(connectionElement) as any).value
             let client = new WatcherClient(cs, "watcher");
             let payloads: WatcherPayload[] = await client.peek_messages()
+
             SetQueuedItems(containingElement, payloads);
         }
         catch(err) {
         }
-    }, 10000);
+    }, 1000);
 
     return interval;
 }
@@ -137,8 +316,6 @@ export class WatcherClient {
 
     async peek_messages(): Promise<Array<WatcherPayload>> {
         let messages = await this.Queue.peekMessages({ numberOfMessages: 10 });
-
-        console.log(messages);
 
         return messages.peekedMessageItems.map(element => {
             return encodeBase64ToJson(element.messageText) as WatcherPayload;

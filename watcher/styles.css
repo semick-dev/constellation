@@ -88,8 +88,12 @@ textarea {
     width: 500px;
 }
 
+.queueItem {
+    margin: 5px;
+}
+
 .button {
-    
+
 }
 
 .unknown {
