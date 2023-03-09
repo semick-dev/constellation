@@ -89,7 +89,8 @@ textarea {
 }
 
 .queueItem {
-    margin: 5px;
+    padding-top: 10px;
+    padding-left: 10px;
 }
 
 .button {
