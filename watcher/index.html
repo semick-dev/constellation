@@ -12,69 +12,81 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <h1>
-            Set a connection string
-        </h1>
-
-        <label for="connection">SAS Connection String: </label>
-        <input  autocomplete="on" type="text" id="connection"/>
-
-
-        
-        <div>
-            <h1>
-                Queue a work item
-            </h1>
-            <form id="submissioncontrol">
-                <ul>
-                    <li>
-                        <label for="url">URL: </label>
-                        <input type="text" id="url"/>
-                    <li>
-                        <label for="payloadtype">Targeted Resource: </label>
-                        <select name="payload_type" id="payloadtype">
-                            <option value="youtubedl">YoutubeDL</option>
-                        </select>
-                    </li>
-                    <li>
-                        <label for="qualityselection">Audio or Video: </label>
-
-                        <select name="quality_selection" id="qualityselection">
-                            <option value="bestaudio+bestvideo">Audio + Video</option>
-                            <option value="bestaudio">Audio Only</option>
-                        </select>
-                    </li>
-                    <li>
-                        <button id="enqueue" class="button" type="button">Queue</button><button id="requeue" class="button" type="button">Requeue Last Successful</button>
-                    </li>
-                </ul>
-            </form>
+        <div id="main">
+            <table style="width:100%; padding: 0; margin: 0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td id="controlspanel">
+                        <h1>
+                            Set a connection string
+                        </h1>
+                
+                        <label for="connection">SAS Connection String: </label>
+                        <input  autocomplete="on" type="text" id="connection"/>
+                
+                        <h1>
+                            Queue a work item
+                        </h1>
+                        <form id="submissioncontrol">
+                            <table width="100%">
+                                <tr>
+                                    <td style="text-align: left">
+                                        <label for="url">URL: </label>
+                                        <input type="text" id="url"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left">
+                                        <label for="payloadtype">Targeted Resource: </label>
+                                        <select name="payload_type" id="payloadtype">
+                                            <option value="youtubedl">YoutubeDL</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td style="text-align: left">
+                                        <label for="qualityselection">Audio or Video: </label>
+            
+                                        <select name="quality_selection" id="qualityselection">
+                                            <option value="bestaudio+bestvideo">Audio + Video</option>
+                                            <option value="bestaudio">Audio Only</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left">
+                                        <button id="enqueue" class="button" type="button" style="width: 50px">Queue</button>
+                                        <button id="requeue" class="button" type="button" style="width: 200">Requeue Last Successful</button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </td>
+                    <td id="sidepanel" style="height: 100%; vertical-align:top">
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td id="outputpanel" colspan="2">
+                        <h2>
+                            Dequeue a workitem    
+                        </h2>
+                        <button id="dequeue">Dequeue Work</button>
+                        
+                        <h3>
+                            View Result Output
+                        </h3>
+                        <textarea id="viewport">Output will be displayed here.</textarea>
+                    </td>
+                </tr>
+            </table>
         </div>
-
-        <h2>
-            Dequeue a workitem    
-        </h2>
-        <button id="dequeue">Dequeue Work</button>
-        
-        <h3>
-            View Result Output
-        </h3>
-        <textarea id="viewport">Output will be displayed here.</textarea>
     </body>
 
     <script type="text/javascript">
-        function setOutputWindowStatus(classStatus, message){
-            let classlist = ["success", "failure", "loading", "unknown"];
-            let outputWindow = document.getElementById("viewport");
+        let tOut = watcher.StartQueueWatcher(document.getElementById("sidepanel"), "connection")
 
-            for(var i = 0; i < classlist.length; i++){
-                outputWindow.classList.remove(classlist[i]);
-            }
-            outputWindow.classList.add(classStatus);
-            outputWindow.innerHTML = message;
-        }
         var lastRequest = {};
-
         document.getElementById("enqueue").addEventListener("click", async function(event){
             try {
                 let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
@@ -85,39 +97,39 @@
 
                 let payload = new watcher.WatcherPayload(payloadType, qualitySelection, url);
 
-                setOutputWindowStatus("loading", "Adding Queue Item...");
+                watcher.SetOutputWindowStatus("loading", "Adding Queue Item...");
                 let result = await watcherClient.enqueue(payload);
                 document.getElementById("url").value = '';
                 lastRequest = payload;
-                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+                watcher.SetOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err) {
-                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
+                watcher.SetOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });
 
         document.getElementById("dequeue").addEventListener("click", async function(event){
             try {
                 let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
-                setOutputWindowStatus("loading", "Retrieving Item From Queue...");
+                watcher.SetOutputWindowStatus("loading", "Retrieving Item From Queue...");
                 let result = await watcherClient.dequeue();
-                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+                watcher.SetOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err){
-                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
+                watcher.SetOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });
 
         document.getElementById("requeue").addEventListener("click", async function(event){
             try {
                 let watcherClient = new watcher.WatcherClient(document.getElementById("connection").value, "watcher");
-                setOutputWindowStatus("loading", "Adding Queue Item...");
+                watcher.SetOutputWindowStatus("loading", "Adding Queue Item...");
                 let result = await watcherClient.enqueue(lastRequest);
                 document.getElementById("url").value = '';
-                setOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
+                watcher.SetOutputWindowStatus("success", JSON.stringify(result, undefined, 4));
             }
             catch(err) {
-                setOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
+                watcher.SetOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
             }
         });
     </script>
