@@ -93,7 +93,7 @@ function getCurrentAssignations(containingElement: HTMLElement): Array<string> {
 function generateTable(): string {
     // initialize table, then get existing assignations to fill the ready ids
     let completeTable: string = `
-    <h3>Queued Items</h3>
+    <h2>Queued Items</h2>
     <table id="sidepaneldata" style="width:100%; padding: 0; margin: 0" cellspacing="0" cellpadding="0">
         <tr>
             <td class="queueItem">
@@ -181,7 +181,7 @@ function updateCell(existingId: string, update: WatcherPayload): void {
     let element = document.getElementById(existingId) as HTMLIFrameElement;
 
     if (element != null){
-        if(update.VideoId.length > 0){
+        if (update.VideoId.length > 0) {
             element.src = `https://www.youtube.com/embed/${update.VideoId}`
             element.id = update.VideoId;
         }

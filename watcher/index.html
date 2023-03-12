@@ -15,30 +15,39 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
+        <nav id="navpanel" class="clearfix">
+            <div class="navitem currentnav">
+                <span id="click_nav">Queue Ops</span>
+            </div>
+            <div class="navitem">
+                <span id="click_nav">Server Info</span>
+            </div>
+        </nav>
         <div id="main" class="clearfix">
             <div id="controlspanel">
-                <h1>
-                    Set a connection string
-                </h1>
+                <h2>
+                    Set connection >
+                </h2>
         
                 <label for="connection">SAS Connection String: </label>
-                <input  autocomplete="on" type="text" id="connection"/>
+                <input  autocomplete="on" type="text" id="connection" />
         
-                <h1>
-                    Queue a work item
-                </h1>
+                <h2>
+                    Set download details >
+                </h2>
                 <form id="submissioncontrol">
                     <section>
                             <label for="url">URL: </label>
                             <input type="text" id="url"/>
                     </section>
+
                     <section>
                         <label for="payloadtype">Targeted Resource: </label>
                         <select name="payload_type" id="payloadtype">
                             <option value="youtubedl">YoutubeDL</option>
                         </select>
                     </section>
-                    
+
                     <section>
                         <label for="qualityselection">Audio or Video: </label>
 
@@ -47,22 +56,23 @@
                             <option value="bestaudio">Audio Only</option>
                         </select>
                     </section>
+
                     <section>
-                            <button id="enqueue" class="button" type="button" style="width: 50px">Queue</button>
-                            <button id="requeue" class="button" type="button" style="width: 200">Requeue Last Successful</button>
+                        <h2>
+                            Send it off >
+                        </h2>
+                        <button id="enqueue" class="button" type="button" style="width: 50px">Queue</button>
+                        <button id="requeue" class="button" type="button" style="width: 200">Requeue Last Successful</button>
+                        <button id="dequeue" class="button" type="button">Dequeue Work</button>
                     </section>
                 </form>
+
             </div>
             <aside id="sidepanel" style="height: 100%; vertical-align:top">
                 
             </aside>
         
             <div id="outputpanel">
-                <h2>
-                    Dequeue a workitem    
-                </h2>
-                <button id="dequeue">Dequeue Work</button>
-                
                 <h3>
                     View Result Output
                 </h3>

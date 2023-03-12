@@ -15,6 +15,8 @@ html {
 }
 
 body {
+    background-color: var(--dark);
+    color: var(--pale);
     min-height: 100%;
     width: 100%;
     padding:0;
@@ -23,17 +25,17 @@ body {
 }
 
 h1 {
-    color: #3D1308;
+    color: var(--bright);
     font-family: 'Orbitron', sans-serif;
 }
 
 h2 {
-    color: #3D1308;
+    color: var(--bright);
     font-family: 'Orbitron', sans-serif;
 }
 
 h3 {
-    color: #3D1308;
+    color: var(--bright);
     font-family: 'Orbitron', sans-serif;
 }
 
@@ -93,27 +95,56 @@ form li + li {
     overflow: hidden;
 }
 
+#navpanel {
+    width: 1024px;
+    margin: 0 auto;
+    vertical-align: middle;
+    text-align: right;
+    padding: 10px;
+}
+
+.navitem {
+    float: right;
+    vertical-align: middle;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: var(--bright);
+    font-size: 1em;
+}
+
+.currentnav {
+    color: white;
+    text-decoration: underline;
+}
+
+.navitem:hover {
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--lightblue);
+}
+
 #main {
     margin: 0 auto;
     width: 1024px;
     min-height: 100%;
-    background-color: #91F5AD;
-    padding-bottom: 300px;
+    border: 1px solid var(--lightblue);
 }
 
 #controlspanel {
     width: 40%;
-    float: left;
-    background-color: #91F5AD;
     padding: 1em;
+    float: left;
 }
 
 #sidepanel {
     width: 60%;
     min-height: 400px;
     float: right;
-    background-color: #91F5AD;
     padding: 1em;
+    border-left: 1px solid var(--lightblue);
 }
 
 #sidepanel table {
@@ -123,14 +154,17 @@ form li + li {
 
 #sidepanel iframe {
     width: 100%;
+    padding: 1em;
 }
 
 #outputpanel {
     float: left;
     clear: both;
     width: 100%;
-    background-color: #91F5AD;
     padding: 1em;
+    border-left: 1px solid var(--lightblue);
+    border-right: 1px solid var(--lightblue);
+    border-top: 1px solid var(--lightblue);
 }
 
 #connection {
