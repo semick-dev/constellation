@@ -40,11 +40,11 @@ h3 {
 }
 
 input {
-    background-color: #edfef0
+    background-color: var(--pale)
 }
 
 textarea {
-    background-color: #edfef0;
+    background-color: var(--pale);
 }
 
 input, textarea {

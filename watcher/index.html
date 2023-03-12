@@ -36,26 +36,38 @@
                     Set download details >
                 </h2>
                 <form id="submissioncontrol">
-                    <section>
-                            <label for="url">URL: </label>
-                            <input type="text" id="url"/>
-                    </section>
+                    <table cellspacing="0" cellpadding="0" style="width: 100%">
+                        <tr>
+                            <td style="text-align: right; width: 70%; padding: 5px;">
+                                <label for="url" style="padding-top: 5px;">URL: </label>
+                            </td>
+                            <td style="text-align: right; width: 30%">
+                                <input type="text" id="url"/>
+                            </td>
+                        </tr>
 
-                    <section>
-                        <label for="payloadtype">Targeted Resource: </label>
-                        <select name="payload_type" id="payloadtype">
-                            <option value="youtubedl">YoutubeDL</option>
-                        </select>
-                    </section>
-
-                    <section>
-                        <label for="qualityselection">Audio or Video: </label>
-
-                        <select name="quality_selection" id="qualityselection">
-                            <option value="bestaudio+bestvideo">Audio + Video</option>
-                            <option value="bestaudio">Audio Only</option>
-                        </select>
-                    </section>
+                        <tr>
+                            <td style="text-align: right; width: 70%; padding: 5px;">
+                                <label for="payloadtype" style="padding-top: 5px;">Targeted Resource: </label>
+                            </td>
+                            <td style="text-align: right; width: 30%">
+                                <select name="payload_type" id="payloadtype" style="width: 100%">
+                                    <option value="youtubedl">YoutubeDL</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; width: 70%; padding: 5px;">
+                                <label for="qualityselection" style="padding-top: 5px;">Audio or Video: </label>
+                            </td>
+                            <td style="text-align: right; width: 30%;">
+                                <select name="quality_selection" id="qualityselection" style="width: 100%">
+                                    <option value="bestaudio+bestvideo">Audio + Video</option>
+                                    <option value="bestaudio">Audio Only</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
 
                     <section>
                         <h2>
@@ -66,7 +78,7 @@
                         <button id="dequeue" class="button" type="button">Dequeue Work</button>
                     </section>
                 </form>
-
+                
             </div>
             <aside id="sidepanel" style="height: 100%; vertical-align:top">
                 
