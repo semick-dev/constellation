@@ -1,0 +1,4 @@
+- [ ] Remove table layout in favor of two columns with clearfix hack applied to containing div `main`
+- [ ] update middle two div to <section>
+- [ ] output remains div with clear: both
+- [ ] apply box-sizing:border-box to *
