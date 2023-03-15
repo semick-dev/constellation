@@ -20,7 +20,7 @@ namespace Constellation.Drone.Downloader.Converter
             {
                 ProcessHandler handler = new ProcessHandler();
                 
-                var result = handler.Run("ffmpeg", "", Configuration.WorkingDirectory);
+                var result = handler.Run("ffmpeg", "-h", Configuration.WorkingDirectory);
 
                 return result.ExitCode == 0;
             } 
