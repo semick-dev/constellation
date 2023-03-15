@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
+using Constellation.Drone.Downloader.Converter;
 using Constellation.Drone.Downloader.DownloadClient;
 using System.Text;
 using System.Text.Json;
@@ -64,6 +65,17 @@ namespace Constellation.Drone.Downloader
                 var handler = _operations[payload.PayloadType];
 
                 var result = await handler.Download(payload);
+
+                if (result != null)
+                {
+                    var conversion = MediaConverter.GetMediaConverter(result);
+
+                    if (conversion != null)
+                    {
+                        var conversionResult = conversion.Convert(result);
+                    }
+                } 
+                
 
                 // todo: add in call to LiteClient and log the workResult!
             }

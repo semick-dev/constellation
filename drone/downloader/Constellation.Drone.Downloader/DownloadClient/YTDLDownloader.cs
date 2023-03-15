@@ -28,7 +28,7 @@ namespace Constellation.Drone.Downloader.DownloadClient
                 string thumbnailUri = await DownloadThumbnail(payload);
                 string downloadFormat = "%(id)s.%(ext)s";
 
-                processHandler.Run("youtube-dl", $"-f {payload.QualitySelection} -v --write-info-json -o \"{downloadFormat}\" {payload.Url}", Configuration.DownloadDirectory);
+                var result = processHandler.Run("youtube-dl", $"-f {payload.QualitySelection} -v --write-info-json -o \"{downloadFormat}\" {payload.Url}", Configuration.DownloadDirectory);
                 string downloadUri = GetDownloadUri(payload.Url);
 
                 return new WorkResult(payload, thumbnailUri, downloadUri);

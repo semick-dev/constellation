@@ -8,6 +8,27 @@ using System.Threading.Tasks;
 
 namespace Constellation.Drone.Downloader
 {
+    public class ProcessResult
+    {
+        public string StdOut { get; set; }
+        public string StdErr { get; set; }
+        public int ExitCode { get; set; }
+
+        public ProcessResult()
+        {
+            StdOut = string.Empty;
+            StdErr = string.Empty;
+            ExitCode = -1;
+        }
+
+        public ProcessResult(string? stdOut, string? stdErr, int exitCode)
+        {
+            StdOut = stdOut ?? string.Empty;
+            StdErr = stdErr ?? string.Empty;
+            ExitCode = exitCode;
+        }
+    }
+
     public class ProcessHandler
     {
         public virtual ProcessStartInfo CreateProcessInfo(string exe, string workingDirectory)
@@ -26,10 +47,11 @@ namespace Constellation.Drone.Downloader
             return startInfo;
         }
 
-        public void Run(string exe, string arguments, string workingDirectory)
+        public ProcessResult Run(string exe, string arguments, string workingDirectory)
         {
             ProcessStartInfo processStartInfo = CreateProcessInfo(exe, workingDirectory);
             processStartInfo.Arguments = arguments;
+            ProcessResult result = new ProcessResult();
 
             try
             {
@@ -77,6 +99,8 @@ namespace Constellation.Drone.Downloader
                     Console.WriteLine($"StdErr: {stdError}");
                     Console.WriteLine($"ExitCode: {process.ExitCode}");
 
+                    result = new ProcessResult(stdOut, stdError, returnCode);
+
                     if (process.ExitCode != 0)
                     {
                         throw new RetriableMessageException($"Ran into a non-zero exitcode attempting to download: {process.ExitCode}. Enqueuing message for later work");
@@ -85,8 +109,10 @@ namespace Constellation.Drone.Downloader
             }
             catch (Exception e)
             {
-                throw new RetriableMessageException("Ran into an unexpected exception while starting the youtube-dl process. " + e.Message + " Enqueueing message for later work.");
+                throw new RetriableMessageException($"Ran into an unexpected exception while starting the {exe} process. " + e.Message + " Enqueueing message for later work.");
             }
+
+            return result;
         }
     }
 }
