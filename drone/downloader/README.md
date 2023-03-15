@@ -20,9 +20,12 @@ Needs 2 arguments from the enqueued work item:
 
 - [x] Youtube URL
 - [x] One of two options: [`bestaudio`, `bestvideo+bestaudio`]
-- [x] And starts to download to the staging.
-- [x] Also downloads the highest def thumbnail image it can find
 
-## Each method saves a record...
+After that, it
 
-...into a sqlite database written into the working directory `drone-downloader` is invoked in. Overwridden by `DRONE_DOWNLOADER_DIRECTORY`.
+- [x] And starts to download to the staging folder using `youtubedl` on the PATH.
+   - Outputs to `<videoId>.(webm/m4a/mp4/flv)`
+   - Dumps `<videoId>.info.json` with metadata alongside.
+- [x] Also downloads the highest def thumbnail image it can find, 
+   - `<videoId>.jpg`
+- [x] Uses `ffmpeg` on the path to convert `.webm` -> `.m4a`
