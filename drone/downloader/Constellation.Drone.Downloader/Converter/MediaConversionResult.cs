@@ -1,10 +1,4 @@
 ﻿using Constellation.Drone.Downloader.DownloadClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Constellation.Drone.Downloader.ProcessHandler;
 
 namespace Constellation.Drone.Downloader.Converter
 {
