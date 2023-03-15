@@ -109,7 +109,7 @@ namespace Constellation.Drone.Downloader
             }
             catch (Exception e)
             {
-                throw new RetriableMessageException("Ran into an unexpected exception while starting the youtube-dl process. " + e.Message + " Enqueueing message for later work.");
+                throw new RetriableMessageException($"Ran into an unexpected exception while starting the {exe} process. " + e.Message + " Enqueueing message for later work.");
             }
 
             return result;
