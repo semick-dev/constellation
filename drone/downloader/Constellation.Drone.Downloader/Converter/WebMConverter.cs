@@ -28,7 +28,9 @@ namespace Constellation.Drone.Downloader.Converter
 
         public string GetOutputUrl(WorkResult completedWork)
         {
-            return $"{Path.GetFileNameWithoutExtension(completedWork.DownloadUri)}.m4a";
+            var directory = Path.GetDirectoryName(completedWork.DownloadUri);
+
+            return Path.Combine(directory ?? string.Empty, $"{Path.GetFileNameWithoutExtension(completedWork.DownloadUri)}.m4a");
         } 
 
         public MediaConversionResult Convert(WorkResult completedWork)
@@ -38,7 +40,7 @@ namespace Constellation.Drone.Downloader.Converter
 
             if (ToolPresent)
             {
-                var result = ProcessHandler.Run("ffmpeg", $"-i '{inputUri}' -vn '{outputUri}'", Configuration.DownloadDirectory);
+                var result = ProcessHandler.Run("ffmpeg", $"-i \"{inputUri}\" -vn \"{outputUri}\"", Configuration.DownloadDirectory);
 
                 if (result.ExitCode == 0)
                 {
