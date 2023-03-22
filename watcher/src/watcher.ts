@@ -1,4 +1,4 @@
-import { BlobServiceClient } from "@azure/storage-blob";
+import { BlobDownloadResponseParsed, BlobItem, BlobServiceClient, ContainerClient } from "@azure/storage-blob";
 import { QueueClient, QueueSendMessageResponse, QueueServiceClient } from "@azure/storage-queue";
 
 export class WatcherPayload {
@@ -270,10 +270,13 @@ export function StartQueueWatcher(containingElement: HTMLElement, connectionElem
     let interval = setInterval( async () => {
         try {
             let cs = (document.getElementById(connectionElement) as any).value
-            let client = new WatcherClient(cs, "watcher");
-            let payloads: WatcherPayload[] = await client.peek_messages()
 
-            SetQueuedItems(containingElement, payloads);
+            if (cs) {
+                let client = new WatcherClient(cs, "watcher");
+                let payloads: WatcherPayload[] = await client.peek_messages()
+    
+                SetQueuedItems(containingElement, payloads);
+            }
         }
         catch(err) {
         }
@@ -287,14 +290,73 @@ export function StopQueueWatcher(timeout: NodeJS.Timeout): void {
 }
 
 
+export function SetServerInfo(containingElement: HTMLElement, blobContent: string): void {
+    console.log(blobContent);
+    (containingElement as HTMLTextAreaElement).value = blobContent;
+}
+
+
+async function blobToString(blob: Blob): Promise<string> {
+    const fileReader = new FileReader();
+    return new Promise<string>((resolve, reject) => {
+        fileReader.onloadend = (ev: any) => {
+            resolve(ev.target!.result);
+        };
+        fileReader.onerror = reject;
+        fileReader.readAsText(blob);
+    });
+}
+
+export function StartServerInfoWatcher(containingElement: HTMLElement, connectionElement: string): NodeJS.Timeout {
+    let interval = setInterval( async () => {
+        try {
+            let cs = (document.getElementById(connectionElement) as any).value
+
+            if (cs) {
+                let client = new WatcherClient(cs, "watcher");
+                let payloads: string[] = []
+                let iterator = client.Blob.listBlobsFlat().byPage( { maxPageSize: 200 });
+                let response = (await iterator.next()).value;
+    
+                for (let blob of response.segment.blobItems){
+                    let blob2 = blob as BlobItem;
+                    payloads.push(blob2.name)
+                }
+
+                if (payloads) {
+                    let targetBlob:string = payloads.filter( (x) => { return x.indexOf(".txt") > -1}).sort().reverse()[0];
+                    let downloadClient = await client.Blob.getBlobClient(targetBlob);
+                    const downloadBlockBlobResponse = await downloadClient.download();
+                    var blobBody = await downloadBlockBlobResponse.blobBody;
+        
+                    if (blobBody !== undefined){
+                        const downloaded = await blobToString(blobBody);
+                        SetServerInfo(containingElement, downloaded);
+                    }
+                }
+            }
+        }
+        catch(err) {
+        }
+    }, 1000);
+
+    return interval;
+}
+
+
+export function StopServerInfoWatcher(timeout: NodeJS.Timeout): void {
+    clearInterval(timeout);
+}
+
+
 // We are deliberately not catching exceptions in all functions herein. This aids in easier UI response try/catch usage
 export class WatcherClient {
-    Blob: BlobServiceClient;
+    Blob: ContainerClient;
     Queue: QueueClient;
 
-    constructor(connectionString: string, queueName: string){
-        this.Blob = BlobServiceClient.fromConnectionString(connectionString);
-        this.Queue = QueueServiceClient.fromConnectionString(connectionString).getQueueClient(queueName);
+    constructor(connectionString: string, name: string){
+        this.Blob = BlobServiceClient.fromConnectionString(connectionString).getContainerClient(name);
+        this.Queue = QueueServiceClient.fromConnectionString(connectionString).getQueueClient(name);
     }
 
     async enqueue(payload: WatcherPayload): Promise<QueueSendMessageResponse> {
