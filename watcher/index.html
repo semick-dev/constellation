@@ -158,7 +158,6 @@ asdfasdf
         });
 
         document.getElementById("queue_ops").addEventListener("click", async function(event){
-            console.log("clicky");
             let queueClassList = document.getElementById("queueopspanel").classList;
             let infoClassList = document.getElementById("serverinfopanel").classList;
 
@@ -167,21 +166,24 @@ asdfasdf
                 infoClassList.add("hidden");
             }
 
-            infoClassList.remove("currentnav");
-            if (!("currentnav" in queueClassList)){
-                queueClassList.add("currentnav");
+            document.getElementById("server_info").classList.remove("currentnav");
+            if (!("currentnav" in document.getElementById("queue_ops").classList)){
+                document.getElementById("queue_ops").classList.add("currentnav");
             }
         });
 
         document.getElementById("server_info").addEventListener("click", async function(event){
+            let queueClassList = document.getElementById("queueopspanel").classList;
+            let infoClassList = document.getElementById("serverinfopanel").classList;
+
             document.getElementById("serverinfopanel").classList.remove("hidden");
             if (!("hidden" in document.getElementById("queueopspanel").classList)){
                 document.getElementById("queueopspanel").classList.add("hidden");
             }
 
-            document.getElementById("queueopspanel").classList.remove("currentnav");
-            if (!("currentnav" in document.getElementById("serverinfopanel").classList)){
-                document.getElementById("serverinfopanel").classList.add("currentnav");
+            document.getElementById("queue_ops").classList.remove("currentnav");
+            if (!("currentnav" in document.getElementById("server_info").classList)){
+                document.getElementById("server_info").classList.add("currentnav");
             }
         });
     </script>
