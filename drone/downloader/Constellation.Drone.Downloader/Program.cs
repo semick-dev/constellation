@@ -10,20 +10,22 @@ namespace Constellation.Drone.Downloader
         {
             
             var connectionString = args[0];
-            string queueName = "watcher";
+            string containerQueueName = "watcher";
             DroneClient client = new DroneClient();
 
             try
             {
-                client = new DroneClient(connectionString, queueName);
+                client = new DroneClient(connectionString, containerQueueName);
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Unable to create queues/blobs client. Possible bad connection string value \"{args[0]}\"");
-                Console.Write(ex.Message);
+                LoggingClient.Log($"Unable to create queues/blobs client. Possible bad connection string value \"{args[0]}\"");
+                LoggingClient.Log(ex.Message);
+                LoggingClient.Flush();
                 return 1;
             }
-            
+            LoggingClient.SetConnectionString(connectionString, containerQueueName);
+
             // exceptions handled here
             var work = client.GetWork();
 
@@ -35,12 +37,12 @@ namespace Constellation.Drone.Downloader
                 }
                 else
                 {
-                    Console.WriteLine("No work to be executed.");
+                    LoggingClient.Log("No work to be executed.");
                 }
             }
             catch(RetriableMessageException ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggingClient.Log(ex.Message);
                 if (work != null && work.Item2 != null)
                 {
                     client.EnqueueWork(work.Item2);
@@ -48,11 +50,14 @@ namespace Constellation.Drone.Downloader
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.Write(ex.StackTrace);
+                LoggingClient.Log(ex.Message);
+                LoggingClient.Log(ex.StackTrace);
+
+                LoggingClient.Flush();
                 return 1;
             }
 
+            LoggingClient.Flush();
             return 0;
         }
     }

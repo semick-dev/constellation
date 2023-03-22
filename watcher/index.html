@@ -16,14 +16,27 @@
     </head>
     <body>
         <nav id="navpanel" class="clearfix">
-            <div class="navitem currentnav">
-                <span id="click_nav">Queue Ops</span>
+            <div class="navitem currentnav" id="queue_ops">
+                <span>Queue Ops</span>
             </div>
-            <div class="navitem">
-                <span id="click_nav">Server Info</span>
+            <div class="navitem" id="server_info">
+                <span>Server Info</span>
             </div>
         </nav>
-        <div id="main" class="clearfix">
+
+        <div id="serverinfopanel" class="clearfix hidden">
+            <textarea id="infopanel" spellcheck="false">
+dfasdfasdfasdfasdfa
+asdfasdf
+
+asdfasdf
+
+
+asdfasdf
+            </textarea>
+        </div>
+
+        <div id="queueopspanel" class="clearfix">
             <div id="controlspanel">
                 <h2>
                     Set connection >
@@ -94,8 +107,9 @@
     </body>
 
     <script type="text/javascript">
-        let tOut = watcher.StartQueueWatcher(document.getElementById("sidepanel"), "connection")
-
+        let tOut = watcher.StartQueueWatcher(document.getElementById("sidepanel"), "connection");
+        let sOut = watcher.StartServerInfoWatcher(document.getElementById("infopanel"), "connection");
+        
         var lastRequest = {};
         document.getElementById("enqueue").addEventListener("click", async function(event){
             try {
@@ -140,6 +154,36 @@
             }
             catch(err) {
                 watcher.SetOutputWindowStatus("failure", JSON.stringify(err, undefined, 4));
+            }
+        });
+
+        document.getElementById("queue_ops").addEventListener("click", async function(event){
+            let queueClassList = document.getElementById("queueopspanel").classList;
+            let infoClassList = document.getElementById("serverinfopanel").classList;
+
+            queueClassList.remove("hidden");
+            if (!("hidden" in infoClassList)){
+                infoClassList.add("hidden");
+            }
+
+            document.getElementById("server_info").classList.remove("currentnav");
+            if (!("currentnav" in document.getElementById("queue_ops").classList)){
+                document.getElementById("queue_ops").classList.add("currentnav");
+            }
+        });
+
+        document.getElementById("server_info").addEventListener("click", async function(event){
+            let queueClassList = document.getElementById("queueopspanel").classList;
+            let infoClassList = document.getElementById("serverinfopanel").classList;
+
+            document.getElementById("serverinfopanel").classList.remove("hidden");
+            if (!("hidden" in document.getElementById("queueopspanel").classList)){
+                document.getElementById("queueopspanel").classList.add("hidden");
+            }
+
+            document.getElementById("queue_ops").classList.remove("currentnav");
+            if (!("currentnav" in document.getElementById("server_info").classList)){
+                document.getElementById("server_info").classList.add("currentnav");
             }
         });
     </script>

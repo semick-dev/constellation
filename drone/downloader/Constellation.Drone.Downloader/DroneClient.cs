@@ -59,7 +59,7 @@ namespace Constellation.Drone.Downloader
 
         public async Task DoWork(WatcherPayload payload)
         {
-            Console.WriteLine($"Invoking {payload.PayloadType} against URL {payload.Url} with quality of {payload.QualitySelection}.");
+            LoggingClient.Log($"Invoking {payload.PayloadType} against URL {payload.Url} with quality of {payload.QualitySelection}.");
             if (payload.PayloadType != null)
             {
                 var handler = _operations[payload.PayloadType];
@@ -87,7 +87,7 @@ namespace Constellation.Drone.Downloader
 
         private void _e(string message)
         {
-            Console.WriteLine(message);
+            LoggingClient.Log(message);
             Environment.Exit(1);
         }
 
@@ -125,7 +125,7 @@ namespace Constellation.Drone.Downloader
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Unable to get queueMessage");
+                    LoggingClient.Log("Unable to get queueMessage");
                     _e(ex.Message);
                 }
 
@@ -138,7 +138,7 @@ namespace Constellation.Drone.Downloader
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Unable to cleanup queue message, continuing.");
+                    LoggingClient.Log("Unable to cleanup queue message, continuing.");
                 }
 
                 return new Tuple<QueueMessage?, WatcherPayload?>(queueMessage, payload);

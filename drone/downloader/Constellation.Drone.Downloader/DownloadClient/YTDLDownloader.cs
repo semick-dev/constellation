@@ -142,7 +142,7 @@ namespace Constellation.Drone.Downloader.DownloadClient
                     
                 if (imageBytes.Length == 0)
                 {
-                    Console.WriteLine($"Unable to download any quality thumbnail for video id \"videoId\"");
+                    LoggingClient.Log($"Unable to download any quality thumbnail for video id \"videoId\"");
                 }
                 else
                 {
@@ -153,14 +153,14 @@ namespace Constellation.Drone.Downloader.DownloadClient
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Unable to write image bytes to {targetFile}");
-                        Console.WriteLine(e.Message);
+                        LoggingClient.Log($"Unable to write image bytes to {targetFile}");
+                        LoggingClient.Log(e.Message);
                     }
                 }
             }
             else
             {
-                Console.WriteLine("Unable to download thumbnail for nonexistent video id.");
+                LoggingClient.Log("Unable to download thumbnail for nonexistent video id.");
             }
 
             return string.Empty;
