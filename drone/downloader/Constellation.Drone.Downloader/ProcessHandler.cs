@@ -55,7 +55,7 @@ namespace Constellation.Drone.Downloader
 
             try
             {
-                Console.WriteLine($"{exe} {arguments}");
+                LoggingClient.Log($"{exe} {arguments}");
 
                 var output = new List<string>();
                 var error = new List<string>();
@@ -95,9 +95,9 @@ namespace Constellation.Drone.Downloader
                     var stdOut = string.Join(Environment.NewLine, output);
                     var stdError = string.Join(Environment.NewLine, error);
 
-                    Console.WriteLine($"StdOut: {stdOut}");
-                    Console.WriteLine($"StdErr: {stdError}");
-                    Console.WriteLine($"ExitCode: {process.ExitCode}");
+                    LoggingClient.Log($"StdOut: {stdOut}");
+                    LoggingClient.Log($"StdErr: {stdError}");
+                    LoggingClient.Log($"ExitCode: {process.ExitCode}");
 
                     result = new ProcessResult(stdOut, stdError, returnCode);
 

@@ -48,12 +48,12 @@ namespace Constellation.Drone.Downloader.Converter
                 }
                 else
                 {
-                    Console.WriteLine("Conversion exited without exit code 0. Throwing an unretriable exception. ");
+                    LoggingClient.Log("Conversion exited without exit code 0. Throwing an unretriable exception. ");
                 }
             }
             else
             {
-                Console.WriteLine($"Unable to run conversion of {inputUri} to {outputUri} because ffmpeg is not present on this machine.");
+                LoggingClient.Log($"Unable to run conversion of {inputUri} to {outputUri} because ffmpeg is not present on this machine.");
             }
 
             return new MediaConversionResult(completedWork, new ProcessResult(), string.Empty);
