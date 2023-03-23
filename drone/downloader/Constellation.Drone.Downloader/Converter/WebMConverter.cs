@@ -40,7 +40,20 @@ namespace Constellation.Drone.Downloader.Converter
 
             if (ToolPresent)
             {
-                var result = ProcessHandler.Run("ffmpeg", $"-i \"{inputUri}\" -vn \"{outputUri}\"", Configuration.DownloadDirectory);
+                var result = new ProcessResult()
+                {
+                    ExitCode = 0,
+                    StdOut = "Output already exists! Skipping."
+                };
+
+                if (!File.Exists(outputUri))
+                {
+                    result = ProcessHandler.Run("ffmpeg", $"-i \"{inputUri}\" -vn \"{outputUri}\"", Configuration.DownloadDirectory);
+                }
+                else
+                {
+                    LoggingClient.Log(result.StdOut);
+                }
 
                 if (result.ExitCode == 0)
                 {
