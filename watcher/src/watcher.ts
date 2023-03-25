@@ -291,7 +291,6 @@ export function StopQueueWatcher(timeout: NodeJS.Timeout): void {
 
 
 export function SetServerInfo(containingElement: HTMLElement, blobContent: string): void {
-    console.log(blobContent);
     (containingElement as HTMLTextAreaElement).value = blobContent;
 }
 
@@ -315,16 +314,17 @@ export function StartServerInfoWatcher(containingElement: HTMLElement, connectio
             if (cs) {
                 let client = new WatcherClient(cs, "watcher");
                 let payloads: string[] = []
-                let iterator = client.Blob.listBlobsFlat().byPage( { maxPageSize: 200 });
-                let response = (await iterator.next()).value;
-    
-                for (let blob of response.segment.blobItems){
-                    let blob2 = blob as BlobItem;
-                    payloads.push(blob2.name)
+                for await (const response of client.Blob.listBlobsFlat().byPage({ maxPageSize: 200 })) {
+                    for (let blob of response.segment.blobItems){
+                        let blob2 = blob as BlobItem;
+                        payloads.push(blob2.name)
+                    }
                 }
 
                 if (payloads) {
                     let targetBlob:string = payloads.filter( (x) => { return x.indexOf(".txt") > -1}).sort().reverse()[0];
+
+                    console.log(payloads);
                     let downloadClient = await client.Blob.getBlobClient(targetBlob);
                     const downloadBlockBlobResponse = await downloadClient.download();
                     var blobBody = await downloadBlockBlobResponse.blobBody;
