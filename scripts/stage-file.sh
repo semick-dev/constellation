@@ -10,7 +10,7 @@ fi
 if [[ ! -d $2 ]]; then
     echo "Creating staging directory ${2}"
     mkdir $2
-done
+fi
 
 stage_file() {
     local file_name=$1
@@ -18,6 +18,7 @@ stage_file() {
 
     if [[ ! file_name =~ .*.json ]]; then
         # we will need to update the target file name to find the json metadata
+        file_name = "${file_name%.*}"
     fi
 
     local new_file_name=(jq '.title' $file_name)
