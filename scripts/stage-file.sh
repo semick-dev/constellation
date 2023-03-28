@@ -15,28 +15,36 @@ fi
 stage_file() {
     local file_name=$1
     local staging_directory=$2
+    echo $file_name
+    echo $staging_directory
 
-    if [[ ! file_name =~ .*.json ]]; then
+    # trim off trailing / in staging directory
+
+    if [[ ! file_name=~.*.json ]]; then
         # we will need to update the target file name to find the json metadata
+        echo "file name doesn't look like it ends with json!"
         file_name = "${file_name%.*}.json"
+	echo "$file_name"
     fi
 
-    local new_file_name=(jq '.title' $file_name)
-    local extension=(jq '.ext' $file_name)
-    local channel=(jq '.channel' $file_name)
-    local video_id=(jq '.id' $file_name)
-    local target_directory="$staging_directory/$channel/"
+    local new_file_name=$(jq '.title' $file_name)
+    local extension=$(jq '.ext' $file_name)
+    local channel=$(jq '.channel' $file_name)
+    local video_id=$(jq '.id' $file_name)
+    local target_directory="$staging_directory/$channel"
 
     # todo, make this a case statement
     if [[ $extension == ".webm" ]]; then
         extension=".m4a"
     fi
 
-    old_file_name="${video_id}{extension}"
-    new_file_name="${new_file_name}${extension}"
+    old_file_name=${video_id}.${extension}
+    new_file_name=${new_file_name}.${extension}
+
+    # todo: sanitize channel name to remove bad path characters
 
     # now all we need to do is copy to the staging directory
-    echo "mv $old_file_name " + "$target_directory/$new_file_name"
+    echo mv $old_file_name $target_directory/$new_file_name
 }
 
 stage_file $1 $2
