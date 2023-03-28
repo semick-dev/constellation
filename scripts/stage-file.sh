@@ -18,7 +18,7 @@ stage_file() {
 
     if [[ ! file_name =~ .*.json ]]; then
         # we will need to update the target file name to find the json metadata
-        file_name = "${file_name%.*}"
+        file_name = "${file_name%.*}.json"
     fi
 
     local new_file_name=(jq '.title' $file_name)
