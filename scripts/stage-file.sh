@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+  GNU nano 4.8                                            scripts/stage-file.sh                                                      #!/usr/bin/bash
 target_file=${1:?"Must provide a target file."}
 target_directory=${2:?"Must provide a staging directory."}
 
@@ -20,22 +20,20 @@ stage_file() {
 
     # trim off trailing / in staging directory
 
-    if [[ ! file_name=~.*.json ]]; then
+    if [[ ! "$file_name" =~ .*.json ]]; then
         # we will need to update the target file name to find the json metadata
-        echo "file name doesn't look like it ends with json!"
-        file_name = "${file_name%.*}.json"
-	echo "$file_name"
+        file_name=${file_name%.*}.info.json
     fi
 
     local new_file_name=$(jq '.title' $file_name)
     local extension=$(jq '.ext' $file_name)
     local channel=$(jq '.channel' $file_name)
     local video_id=$(jq '.id' $file_name)
-    local target_directory="$staging_directory/$channel"
+    local target_directory=$staging_directory$channel/
 
     # todo, make this a case statement
     if [[ $extension == ".webm" ]]; then
-        extension=".m4a"
+        extension=.m4a
     fi
 
     old_file_name=${video_id}.${extension}
@@ -43,11 +41,16 @@ stage_file() {
 
     # todo: sanitize channel name to remove bad path characters
 
-    # sanitize channel 
+    # sanitize channel
 
     # now all we need to do is copy to the staging directory
-    echo mv $old_file_name $target_directory/$new_file_name
+    echo mv $old_file_name $target_directory$new_file_name
 }
 
 stage_file $1 $2
+
+
+
+
+
 
