@@ -15,10 +15,16 @@ fi
 stage_file() {
     local file_name=$1
     local staging_directory=$2
+    echo $file_name
+    echo $staging_directory
+
+    # trim off trailing / in staging directory
 
     if [[ ! file_name=~.*.json ]]; then
         # we will need to update the target file name to find the json metadata
-        file_name="${file_name%.*}.json"
+        echo "file name doesn't look like it ends with json!"
+        file_name = "${file_name%.*}.json"
+	echo "$file_name"
     fi
 
     local new_file_name=$(jq '.title' $file_name)
@@ -32,8 +38,10 @@ stage_file() {
         extension=".m4a"
     fi
 
-    old_file_name="${video_id}${extension}"
-    new_file_name="${new_file_name}${extension}"
+    old_file_name=${video_id}.${extension}
+    new_file_name=${new_file_name}.${extension}
+
+    # todo: sanitize channel name to remove bad path characters
 
     # sanitize channel 
 
