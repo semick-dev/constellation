@@ -74,8 +74,7 @@ namespace Constellation.Drone.Downloader
                     {
                         var conversionResult = conversion.Convert(result);
                     }
-                } 
-                
+                }
 
                 // todo: add in call to LiteClient and log the workResult!
             }
