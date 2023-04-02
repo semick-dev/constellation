@@ -25,4 +25,13 @@
     <ProjectReference Include="..\Constellation.Drone.Downloader\Constellation.Drone.Downloader.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestEntries\downloaded.info.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestEntries\undownloaded.info.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

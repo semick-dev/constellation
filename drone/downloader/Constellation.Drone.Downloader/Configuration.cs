@@ -13,7 +13,7 @@
             {
                 var environmentSetting = Environment.GetEnvironmentVariable("DRONE_DOWNLOADER_LOG_DIRECTORY");
                 return environmentSetting ?? Path.Join(Environment.CurrentDirectory, "log");
-            } 
+            }
         }
 
         public static string DownloadDirectory { get

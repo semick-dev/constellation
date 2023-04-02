@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Constellation.Drone.Downloader.DownloadClient
 {
@@ -16,7 +17,7 @@ namespace Constellation.Drone.Downloader.DownloadClient
         public YTDLDownloader() { }
         private ProcessHandler processHandler = new ProcessHandler();
 
-        public async Task<WorkResult> Download(WatcherPayload payload)
+        public async Task<WorkResult?> Download(WatcherPayload payload)
         {
             if (!Directory.Exists(Configuration.DownloadDirectory))
             {
@@ -27,9 +28,16 @@ namespace Constellation.Drone.Downloader.DownloadClient
             {
                 string thumbnailUri = await DownloadThumbnail(payload);
                 string downloadFormat = "%(id)s.%(ext)s";
+                string downloadUri = string.Empty;
+
+                if (IsAlreadyDownloaded(payload.Url)) {
+
+                    LoggingClient.Log($"Discovered an info.json for \"${ExtractVideoId(payload.Url)}\" with downloaded bit set to true. Skipping download.");
+                    return null;
+                }
 
                 var result = processHandler.Run("youtube-dl", $"-f {payload.QualitySelection} -v --write-info-json -o \"{downloadFormat}\" {payload.Url}", Configuration.DownloadDirectory);
-                string downloadUri = GetDownloadUri(payload.Url);
+                downloadUri = GetDownloadUri(payload.Url);
 
                 return new WorkResult(payload, thumbnailUri, downloadUri);
             }
@@ -39,7 +47,42 @@ namespace Constellation.Drone.Downloader.DownloadClient
             }
         }
 
-        public string GetDownloadUri(string url)
+        public bool IsAlreadyDownloaded(string url)
+        {
+            string videoId = ExtractVideoId(url);
+            var infoJson = Path.Combine(Configuration.DownloadDirectory, $"{videoId}.info.json");
+            
+            if (File.Exists(infoJson))
+            {
+                try
+                {
+                    var node = GetInfoJson(url);
+
+                    var downloadedBit = node.Root["downloaded"];
+                    if (downloadedBit != null)
+                    {
+                        if (downloadedBit.ToString().ToLower() == "true")
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    LoggingClient.Log(e.Message);
+                    LoggingClient.Log("Can't find downloaded bit in info json. Hit an exception accessing, redownloading!");
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        private JsonNode GetInfoJson(string url)
         {
             string videoId = ExtractVideoId(url);
             var infoJson = Path.Combine(Configuration.DownloadDirectory, $"{videoId}.info.json");
@@ -52,18 +95,40 @@ namespace Constellation.Drone.Downloader.DownloadClient
 
                 if (jsonNode != null)
                 {
-                    // todo: ready to add title to name if necessary
-                    var possibleTitle = jsonNode.Root["title"];
-                    var possibleExt = jsonNode.Root["ext"];
-                    if (possibleTitle != null)
-                    {
-                        ext = possibleTitle.ToString();
-                    }
-                    if (possibleExt != null)
-                    {
-                        ext = possibleExt.ToString();
-                    }
-                    
+                    return jsonNode;
+                }
+                else
+                {
+                    throw new Exception("Unable to open an info.json for this file.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Uses the .info.json provided by a successful youtubedl invocation to provide a location of the resulting file.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public string GetDownloadUri(string url)
+        {
+            string videoId = ExtractVideoId(url);
+            var infoJson = Path.Combine(Configuration.DownloadDirectory, $"{videoId}.info.json");
+            string ext = string.Empty;
+
+            var jsonNode = GetInfoJson(url);
+
+            if (jsonNode != null)
+            {
+                // todo: ready to add title to name if necessary
+                var possibleTitle = jsonNode.Root["title"];
+                var possibleExt = jsonNode.Root["ext"];
+                if (possibleTitle != null)
+                {
+                    ext = possibleTitle.ToString();
+                }
+                if (possibleExt != null)
+                {
+                    ext = possibleExt.ToString();
                 }
             }
 

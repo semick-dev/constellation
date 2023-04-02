@@ -1,0 +1,81 @@
+#!/usr/bin/bash
+
+# Currently this script expects to be invoked from _within_ the downloads directory.
+# Specifically where we access the info json, we are passing "./" in front of the path
+# so that file names starting with '-' don't break the commands.
+target_file=${1:?"Must provide a target file as first argument."}
+
+echo $STAGING_DIRECTORY
+
+if [[ ! $STAGING_DIRECTORY ]]; then
+    target_directory=${2:?"Must provide a staging directory as second argument."}
+else
+    target_directory=$STAGING_DIRECTORY
+fi
+
+if [[ ! -e $1 ]]; then
+    echo "File must exist to move it to staging."
+    exit 1
+fi
+
+if [[ ! -d $target_directory ]]; then
+    echo "Creating staging directory ${target_directory}"
+    mkdir $target_directory
+fi
+
+stage_file() {
+    local file_name=$1
+    local staging_directory=$2
+
+    if [[ ! "$file_name" =~ .*.json ]]; then
+        # we will need to update the target file name to find the json metadata
+        file_name=${file_name%.*}.info.json
+    fi
+
+    local new_file_name=$(jq -r '.title' ./$file_name)
+    local extension=$(jq -r '.ext' ./$file_name)
+    local channel=$(jq -r '.channel' ./$file_name)
+    local video_id=$(jq -r '.id' ./$file_name)
+    local target_directory=$staging_directory$channel/
+    local tmp_file=/tmp/$video_id.info.json
+    local new_poster=${new_file_name}.jpg
+    local old_poster=${video_id}.jpg
+    local webm_file="./$video_id.webm"
+
+    if [[ $extension == "webm" ]]; then
+        extension=m4a
+    fi
+
+    local old_file_name=${video_id}.${extension}
+    local new_file_name=${new_file_name}.${extension}
+
+    # if there exists a webm, we will have converted to m4a in the drone downloader.
+    # we need to clean up the file!
+    if [[ -e "$webm_file" ]]; then
+        # however, before the auto-converter was written, drone-downloader
+        # didn't automatically convert .webm to .m4a. so let's account for that
+        # here.
+        if [[ ! -e "$old_file_name" && "$old_file_name" =~ .*.m4a ]]; then
+            ffmpeg -i "$webm_file" -vn "$old_file_name"
+        fi
+
+        rm "$webm_file"
+    fi
+
+    mkdir -p "$target_directory"
+
+    mv "./$old_file_name" "$target_directory$new_file_name"
+    mv "./$old_poster" "$target_directory$new_poster"
+
+    # update downloaded bit
+    jq '.downloaded = true' ./$file_name > $tmp_file && mv $tmp_file ./$file_name
+    echo "Wrote $target_directory$new_file_name and thumbnail"
+}
+
+stage_file $1 $2
+
+
+
+
+
+
