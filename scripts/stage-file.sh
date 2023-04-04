@@ -72,7 +72,7 @@ stage_file() {
     echo "Wrote $target_directory$new_file_name and thumbnail"
 }
 
-stage_file $1 $2
+stage_file $1 $target_directory
 
 
 
