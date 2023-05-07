@@ -41,25 +41,33 @@ stage_file() {
     local new_poster=${new_file_name}.jpg
     local old_poster=${video_id}.jpg
     local webm_file="./$video_id.webm"
+    local mkv_file="./$video_id.mkv"
 
     if [[ $extension == "webm" ]]; then
         extension=m4a
     fi
 
+    if [[ $extension == "mkv" ]]; then
+        extension=mp4
+    fi
+
     local old_file_name=${video_id}.${extension}
     local new_file_name=${new_file_name}.${extension}
 
-    # if there exists a webm, we will have converted to m4a in the drone downloader.
-    # we need to clean up the file!
+    # handle webm
     if [[ -e "$webm_file" ]]; then
-        # however, before the auto-converter was written, drone-downloader
-        # didn't automatically convert .webm to .m4a. so let's account for that
-        # here.
         if [[ ! -e "$old_file_name" && "$old_file_name" =~ .*.m4a ]]; then
             ffmpeg -i "$webm_file" -vn "$old_file_name"
         fi
 
         rm "$webm_file"
+    fi
+
+    # handle mkv
+    if [[ -e "$mkv_file" ]]; then
+        if [[ ! -e "$old_file_name" && "$old_file_name" =~ .*.mp4 ]]; then
+            ffmpeg -i $mkv_file -codec copy -strict -2 "$old_file_name"
+        fi
     fi
 
     mkdir -p "$target_directory"
@@ -73,9 +81,3 @@ stage_file() {
 }
 
 stage_file $1 $target_directory
-
-
-
-
-
-
